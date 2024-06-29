@@ -12,12 +12,12 @@ public class MapperPrevision {
     private final ModelMapper mapper;
 
     public PrevisionDto convertToDto(Prevision prevision){
-        PrevisionDto previsionDto = mapper.map(prevision, PrevisionDto.class);
-        return previsionDto;
+        return mapper.map(prevision, PrevisionDto.class);
+
     }
     public Prevision convertToModel(PrevisionDto previsionDto){
-        Prevision prevision = mapper.map(previsionDto, Prevision.class);
-        return prevision;
+        return mapper.map(previsionDto, Prevision.class);
+
     }
 
 }

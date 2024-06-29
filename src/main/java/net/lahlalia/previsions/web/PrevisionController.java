@@ -2,12 +2,10 @@ package net.lahlalia.previsions.web;
 
 
 import lombok.RequiredArgsConstructor;
-import net.lahlalia.previsions.dtos.Bac;
 import net.lahlalia.previsions.dtos.EsDto;
 import net.lahlalia.previsions.dtos.IsStockDto;
 import net.lahlalia.previsions.dtos.PrevisionDto;
 import net.lahlalia.previsions.entities.BacItem;
-import net.lahlalia.previsions.entities.Prevision;
 import net.lahlalia.previsions.services.BacItemService;
 import net.lahlalia.previsions.services.PrevisionService;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/api/prevision")
 @RequiredArgsConstructor
 public class PrevisionController {
@@ -38,16 +35,8 @@ public class PrevisionController {
         String nameProduct = bacItemService.getProductNameByIDBac(idBac);
         return ResponseEntity.ok(nameProduct);
     }
-//    @GetMapping("/bac/{idPrevision}")
-//    public ResponseEntity<List<Bac>> getBacsByIdPrevision(@PathVariable Long idPrevision){
-//        List<Bac> bacs = previsionService.getBacsByProdZonePrevision(idPrevision);
-//        return ResponseEntity.ok(bacs);
-//
-//    }
     @GetMapping("/{idPrevision}")
     public ResponseEntity<PrevisionDto> getPrevisionById(@PathVariable Long idPrevision){
-//        PrevisionDto previsionDto = previsionService.getPrevisionById(idPrevision);
-//        return ResponseEntity.ok(previsionDto);
         PrevisionDto previsionDto = previsionService.getPrevisionById(idPrevision);
         return ResponseEntity.ok(previsionDto);
     }
@@ -76,11 +65,6 @@ public class PrevisionController {
         List<EsDto> esDtoList = previsionService.getEsDtos();
         return ResponseEntity.ok(esDtoList);
     }
-//    @GetMapping("/cdate/{date1}/{date2}")
-//    public ResponseEntity<Boolean> checkSameMonthAndYear(@PathVariable Date date1, @PathVariable Date date2) {
-//        boolean result = previsionService.compareDatesByYearAndMonth(date1, date2);
-//        return ResponseEntity.ok(result);
-//    }
     @GetMapping("/cdate/{date1}")
     public ResponseEntity<Integer> checkSameMonthAndYear(@PathVariable Date date1) {
         Integer result = previsionService.getYearFromDate(date1);
@@ -131,21 +115,7 @@ public class PrevisionController {
         double somme = previsionService.calculerSommePrevisionByCityProduitDate(idDepot,product,year,month);
         return ResponseEntity.ok(somme);
     }
-
-//    @GetMapping("/suffisant/{idPrevision}")
-//    public ResponseEntity<Boolean>isStockSufficientForPrevision(@PathVariable Long idPrevision){
-//        Boolean value = previsionService.isStockSufficientForPrevision(idPrevision);
-//        return ResponseEntity.ok(value);
-//    }
-
-
-
-
-//    @GetMapping("/bac/{nameProduct}")
-//    public ResponseEntity<List<BacItem>> getBacsByProductName(@PathVariable String nameProduct){
-//        List<BacItem> bacItems = bacItemService.getBacItemsBynameProduct(nameProduct);
-//        return ResponseEntity.ok(bacItems);
-//    }
+    
 
 }
 

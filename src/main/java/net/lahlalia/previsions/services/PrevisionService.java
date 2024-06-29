@@ -13,16 +13,13 @@ import net.lahlalia.previsions.dtos.PrevisionDto;
 import net.lahlalia.previsions.entities.BacItem;
 import net.lahlalia.previsions.entities.Prevision;
 import net.lahlalia.previsions.exceptions.PrevisionNotFoundException;
-import net.lahlalia.previsions.mappers.BacMapper;
 import net.lahlalia.previsions.mappers.MapperBac;
 import net.lahlalia.previsions.mappers.MapperPrevision;
-import net.lahlalia.previsions.mappers.PrevisionMapper;
 import net.lahlalia.previsions.repositories.BacItemRepository;
 import net.lahlalia.previsions.repositories.PrevisionRepository;
 import net.lahlalia.previsions.restclients.StockRestClient;
 import org.springframework.stereotype.Service;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -154,8 +151,8 @@ public class PrevisionService {
 
     }
     public List<EsDto> getEsDtos(){
-        List<EsDto> esDtoList = stockRestClient.getEs();
-        return esDtoList;
+        return stockRestClient.getEs();
+
     }
     public double calculerABS(Long idPrevision){
         Prevision prevision = previsionRepository.findById(idPrevision).get();
@@ -163,9 +160,9 @@ public class PrevisionService {
 
         double forecaste = previsionDto.getForeCaste();
         double vReel = Math.abs(calculerVreel(previsionDto.getIdPrevision()));
-        double ABS = Math.abs(forecaste - vReel);
+        return Math.abs(forecaste - vReel);
 
-        return ABS;
+
     }
     public List<PrevisionDto> getPrevisionByCityProduit(String ville,String produit)throws EntityNotFoundException{
         if(ville == null ||produit == null){
@@ -173,11 +170,11 @@ public class PrevisionService {
             return null;
         }
         List<PrevisionDto> previsionDtos = getAllPrevision();
-        List<PrevisionDto> filteredPrevisions = previsionDtos.stream()
+        return previsionDtos.stream()
                 .filter(prevision -> ville.equals(prevision.getSupplyEnveloppe()) && produit.equals(prevision.getNameProduct()))
                 .collect(Collectors.toList());
 
-        return filteredPrevisions;
+
 
 
     }
@@ -187,8 +184,8 @@ public class PrevisionService {
             return 0;
         }
         List<PrevisionDto> previsionDtos = getPrevisionByCityProduit(ville,produit);
-        double somme = previsionDtos.stream().mapToDouble(PrevisionDto::getForeCaste).sum();
-        return somme;
+        return previsionDtos.stream().mapToDouble(PrevisionDto::getForeCaste).sum();
+
 
     }
     public double calculerSommePrevisionByCityProduitDate(String idDepot, String produit, int year, int month) {
@@ -211,7 +208,7 @@ public class PrevisionService {
 
         List<PrevisionDto> previsionDtos = getPrevisionByCityProduit(ville, produit);
 
-        double somme = previsionDtos.stream()
+        return previsionDtos.stream()
                 .filter(previsionDto -> {
                     Calendar previsionCal = Calendar.getInstance();
                     previsionCal.setTime(previsionDto.getDate());
@@ -221,7 +218,7 @@ public class PrevisionService {
                 })
                 .mapToDouble(PrevisionDto::getForeCaste)
                 .sum();
-        return somme;
+
     }
 
     public double calculerAccuracy(Long idPrevision) throws EntityNotFoundException {
@@ -242,34 +239,9 @@ public class PrevisionService {
             accuracy = forecast/vreel * 100;
 
         }
-        accuracy = Math.round(accuracy * 100.0) / 100.0;
-        return accuracy;
-    }
+        return Math.round(accuracy * 100.0) / 100.0;
 
-//        if (vreel == 0) {
-//            accuracy = 0;
-//        } else {
-//            if(ABS > (vreel/2)){
-//                double RAE = (ABS / vreel) * 100;
-//                accuracy = RAE;
-//            }else {
-//                // ERREUR ABSOLUE RELATIVE
-//                double RAE = (ABS / vreel) * 100;
-//                accuracy = 100 - RAE;
-//            }
-//
-//            // Limiter les valeurs d'accuracy entre 0 et 100
-//            if (accuracy < 0) {
-//                accuracy = 0;
-//            } else if (accuracy > 100) {
-//                accuracy = 100;
-//            }
-//
-//            // Limiter les nombres après la virgule à 2 chiffres
-//            accuracy = Math.round(accuracy * 100.0) / 100.0;
-//        }
-//        return accuracy;
-//    }
+    }
 
     public double calculerVreel(Long idPrevisionDto)throws EntityNotFoundException{
         if(idPrevisionDto == null){
@@ -326,23 +298,12 @@ public class PrevisionService {
         PrevisionDto previsionDto = mapperPrevision.convertToDto(prevision);
 
         List<BacItem> bacItemList =  previsionDto.getBacItems();
-        double totalCapacityUsed = bacItemList.stream()
+        return bacItemList.stream()
                 .mapToDouble(BacItem::getCapacityUsed)
                 .sum();
-        return totalCapacityUsed;
+
     }
-//    public boolean isStockSufficientForPrevision(Long idPrevision) throws PrevisionNotFoundException {
-//        Prevision prevision = previsionRepository.findById(idPrevision)
-//                .orElseThrow(() -> new PrevisionNotFoundException("Prevision with ID " + idPrevision + " not found"));
-//        PrevisionDto previsionDto = mapperPrevision.convertToDto(prevision);
-//        double safetyStock = 1130;
-//
-//        double forecastedQuantity = previsionDto.getForeCaste();
-//        double currentStock = calculerQuantiteStockProduitVille(idPrevision) - safetyStock;
-//
-//        //Si le stock actuel (currentStock) est supérieur ou égal à la quantité prévue (forecastedQuantity), la méthode retourne true. Cela signifie que le stock est suffisant pour répondre à la prévision.
-//        return currentStock >= forecastedQuantity;
-//    }
+
 public IsStockDto isStockSufficientForPrevision(Long idPrevision) throws PrevisionNotFoundException {
     Prevision prevision = previsionRepository.findById(idPrevision)
             .orElseThrow(() -> new PrevisionNotFoundException("Prevision with ID " + idPrevision + " not found"));
@@ -361,7 +322,7 @@ public IsStockDto isStockSufficientForPrevision(Long idPrevision) throws Previsi
             .mapToDouble(BacItem::getCapacity)
             .sum();
 
-    IsStockDto isStockDto = IsStockDto.builder()
+    return IsStockDto.builder()
             .stockActuel(currentStock)
             .safetyStock(safetyStock)
             .forecaste(forecastedQuantity)
@@ -371,8 +332,7 @@ public IsStockDto isStockSufficientForPrevision(Long idPrevision) throws Previsi
             .productCapacity(capacityProduit)
             .build();
 
-    //Si le stock actuel (currentStock) est supérieur ou égal à la quantité prévue (forecastedQuantity), la méthode retourne true. Cela signifie que le stock est suffisant pour répondre à la prévision.
-     return isStockDto;
+
 }
 
 

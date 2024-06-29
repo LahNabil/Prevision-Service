@@ -9,8 +9,6 @@ import net.lahlalia.previsions.entities.BacItem;
 import net.lahlalia.previsions.repositories.BacItemRepository;
 import net.lahlalia.previsions.restclients.StockRestClient;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,15 +21,6 @@ public class BacItemService {
     private final BacItemRepository bacItemRepository;
     private final StockRestClient stockRestClient;
 
-
-    //    public List<BacItem> getBacItemsBynameProduct(String nameProduct){
-//        List<Bac> bacs = stockRestClient.getBacsByProductName(nameProduct);
-//        List<BacItem> bacItems = bacItemRepository.findAll();
-//        Set<String> bacItemIds = bacItems.stream()
-//                .map(BacItem::getIdBac)
-//                .collect(Collectors.toSet());
-//
-//    }
     public String getProductNameByIDBac(Long idBac){
         BacItem bacItem = bacItemRepository.findById(idBac).get();
         String nameProduct = stockRestClient.getProductNameById(bacItem.getIdProduct());
